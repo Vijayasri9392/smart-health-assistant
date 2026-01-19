@@ -93,6 +93,7 @@ app.get('/signup.html', (_req, res) => res.redirect('/signup'));
 app.get('/index.html', (_req, res) => res.redirect('/dashboard'));
 app.get('/profile.html', (_req, res) => res.redirect('/profile'));
 app.get('/history.html', (_req, res) => res.redirect('/history'));
+app.get('/dashboard.html', (_req, res) => res.redirect('/dashboard'));
 
 // 404
 app.use((_req, res) => {

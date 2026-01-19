@@ -210,14 +210,8 @@ router.post('/predict', authenticateToken, (req, res) => {
 // ✅ NEW - SINGLE RESPONSE ONLY
 router.post('/analyze-report', authenticateToken, upload.single('report'), async (req, res) => {
   try {
-    let responsePayload = null;
-
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-    const fs = require("fs");
-    const path = require("path");
-    const User = require("../models/User");
-    const Papa = require("papaparse");
     const pdfParse = require("pdf-parse");
     const mammoth = require("mammoth");
     const Tesseract = require("tesseract.js");
@@ -225,7 +219,10 @@ router.post('/analyze-report', authenticateToken, upload.single('report'), async
     const filePath = req.file.path;
     const allowed = ["pdf", "txt", "csv", "doc", "docx", "png", "jpg", "jpeg"];
     const ext = (req.file.originalname.split(".").pop() || "").toLowerCase();
-    if (!allowed.includes(ext)) return res.status(400).json({ error: "Unsupported file type" });
+    if (!allowed.includes(ext)) {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      return res.status(400).json({ error: "Unsupported file type" });
+    }
 
 
 
@@ -273,7 +270,7 @@ router.post('/analyze-report', authenticateToken, upload.single('report'), async
       : {};
 
     // 3) Analyze report properly (TXT keyword + CSV numeric comparison)
-    let findings = [];
+    const findings = [];
     let isCritical = false;
     let severity = "low";
     let predictedDisease = "Lab Report Analysis";
@@ -377,12 +374,22 @@ router.post('/analyze-report', authenticateToken, upload.single('report'), async
       typeof f === "string" && !f.toLowerCase().includes("unsupported")
     );
 
-    summary: hasRealFinding
-      ? "✅ Report analyzed. Here’s a simple explanation."
-      : "No major keywords detected in the uploaded report.",
+    const summary = hasRealFinding
+      ? "Report analyzed. Here is a simple explanation."
+      : "No major keywords detected in the uploaded report.";
+
+    const recommendation = isCritical
+      ? "Please consult a doctor as soon as possible."
+      : "If symptoms persist or worsen, consult a doctor.";
+
+    const responsePayload = {
+      predictedDisease,
+      findings,
+      summary,
+      recommendation,
       severity,
       isCritical
-      ;
+    };
 
     // ✅ SAVE TO HISTORY automatically
     const historyEntry = {
@@ -400,9 +407,6 @@ router.post('/analyze-report', authenticateToken, upload.single('report'), async
       { new: true } // ✅ returns updated document
     );
 
-    // cleanup
-    fs.unlinkSync(filePath);
-
     return res.json({
       ...responsePayload,
       savedHistoryEntry: historyEntry,
@@ -418,6 +422,10 @@ router.post('/analyze-report', authenticateToken, upload.single('report'), async
       error: "Could not analyze report",
       details: error && error.message ? error.message : String(error)
     });
+  } finally {
+    if (req.file?.path && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
   }
 
 
