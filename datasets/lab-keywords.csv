@@ -1,0 +1,5 @@
+parameter,low_threshold,high_threshold,low_message,high_message
+hgb,12,17,Low Hemoglobin - Anemia,High Hemoglobin - Dehydration
+rbc,4.2,6.1,Low RBC - Anemia,High RBC - Dehydration
+wbc,4.5,11,Low WBC - Infection risk,High WBC - Infection
+plt,150,450,Low Platelets - Bleeding risk,High Platelets - Clotting risk

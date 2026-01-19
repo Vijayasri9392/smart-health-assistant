@@ -1,0 +1,37 @@
+{
+  "hgb": {
+    "low": {"english": "Low Hemoglobin - Anemia risk", "severity": "Medium - See doctor"},
+    "high": {"english": "High Hemoglobin - Possible dehydration", "severity": "Check hydration"}
+  },
+  "rbc": {
+    "low": {"english": "Low Red Blood Cells - Anemia", "severity": "Medium"},
+    "high": {"english": "High RBC - Possible dehydration", "severity": "Low"}
+  },
+  "wbc": {
+    "low": {"english": "Low White Blood Cells - Infection risk", "severity": "High"},
+    "high": {"english": "High WBC - Possible infection", "severity": "Medium"}
+  },
+  "plt": {
+    "low": {"english": "Low Platelets - Bleeding risk", "severity": "High"},
+    "high": {"english": "High Platelets - Inflammation", "severity": "Medium"}
+  },
+  "hct": {
+    "low": {"english": "Low Hematocrit - Anemia", "severity": "Medium"},
+    "high": {"english": "High Hematocrit - Dehydration", "severity": "Low"}
+  },
+  "mcv": {
+    "low": {"english": "Microcytic anemia - Iron deficiency", "severity": "Medium"},
+    "high": {"english": "Macrocytic anemia - B12 deficiency", "severity": "Medium"}
+  },
+  "blood pressure": {"english": "Hypertension risk", "severity": "Critical - Heart doctor"},
+  "glucose": {"english": "Diabetes risk", "severity": "Critical"},
+  "cholesterol": {"english": "Heart disease risk", "severity": "High"},
+
+
+  "fasting blood sugar": { "english": "Fasting blood sugar is high. This can indicate diabetes risk." },
+  "hba1c": { "english": "HbA1c above 6.5% suggests diabetes. Please consult a doctor." },
+  "ldl cholesterol": { "english": "LDL is bad cholesterol. High LDL increases heart disease risk." },
+  "hdl cholesterol": { "english": "HDL is good cholesterol. Low HDL may increase heart risk." }
+
+}
+

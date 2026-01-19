@@ -1,0 +1,11 @@
+{
+    "fasting blood sugar": {
+        "english": "High fasting blood sugar may indicate diabetes."
+    },
+    "hba1c": {
+        "english": "HbA1c above normal range suggests diabetes."
+    },
+    "ldl": {
+        "english": "High LDL cholesterol increases heart disease risk."
+    }
+}

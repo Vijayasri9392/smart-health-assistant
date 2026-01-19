@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Smart Health - Dashboard  </title>
+  <style>
+    #sidebar { width: 25%; height: 100vh; overflow-y: scroll; background: #f5f5f5; float: left; padding: 10px; }
+    #main { width: 70%; padding: 20px; float: left; }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>Chat History</h3>
+    <ul id="history"></ul>
+  </div>
+
+  <div id="main">
+
+    <h1>Smart Health Assistan</h1>
+    <button onclick="logout()">Logout</button>
+    <br><br>
+
+    <button onclick="window.open('/upload.html', '_blank')">📄 Upload Your Report</button>
+    <button onclick="window.open('/reminder.html', '_blank')">⏰ Remind Me</button>
+
+    <!-- symptom checker -->
+    <h2>Symptom Checker</h2>
+    <textarea id="userQuery" rows="3" placeholder="Describe your Problem..."></textarea>
+    <br>
+    <button onclick="ask()">Predict & Guide</button>
+    <!-- Voice input -->
+    <button id="micBtn" onclick="startVoice()">🎤 Speak</button>
+    <div id="answerBox"></div>
+
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+  
+  <script>
+  // JWT guard
+  if (!localStorage.getItem('token')) location.href = 'login.html';
+
+  // AI + history
+  async function ask() {
+    const query = document.getElementById('userQuery').value;
+    if (!query.trim()) { alert('Enter symptoms'); return; }
+
+    const res = await fetch('/api/answer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, userId: localStorage.getItem('token') })
+    });
+    const data = await res.json();
+
+    if (data.error) { alert(data.error); return; }
+
+    document.getElementById('answerBox').innerHTML = `
+      <h4>${data.disease} (${data.percentage}% chance)</h4>
+      <p><strong>Reason:</strong> ${data.reason}</p>
+      <p><strong>Precaution:</strong> ${data.precaution}</p>
+      <p><strong>Food:</strong> ${data.food_daily}</p>
+      <p><strong>Doctor:</strong> ${data.doctor_speciality}</p>
+    `;
+  }
+
+  // voice button
+  function startVoice() {
+    if (!('webkitSpeechRecognition' in window)) { alert('No Speech API'); return; }
+    const rec = new webkitSpeechRecognition();
+    rec.lang = 'en-US';
+    rec.onresult = e => {
+      document.getElementById('userQuery').value = e.results[0][0].transcript;
+    };
+    rec.start();
+  }
+</script>
+  <!-- <script src="app.js"></script> -->
+</body>
+</html>

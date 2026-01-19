@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><title>Upload Report</title></head>
+<body>
+  <h1>Upload Medical Report</h1>
+  <input type="file" id="fileInput" accept="image/*,application/pdf">
+  <button onclick="upload()">Upload & Extract</button>
+  <pre id="result"></pre>
+
+  <script>
+    async function upload() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return;
+      const fd = new FormData(); fd.append('report', file);
+      const r = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await r.json();
+      document.getElementById('result').textContent = data.text;
+    }
+  </script>
+</body>
+</html>

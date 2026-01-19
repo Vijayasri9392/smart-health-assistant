@@ -1,0 +1,17 @@
+// {
+//     "python.languageServer": "Pylance"
+// }
+{
+  // Ensure the interpreter is the conda env where TensorFlow is installed
+  "python.defaultInterpreterPath": "C:\\Users\\Welcome\\anaconda3\\envs\\fyp_tf\\python.exe",
+
+  // Optionally help Pylance find compiled packages by pointing to site-packages
+  "python.analysis.extraPaths": [
+    "C:\\Users\\Welcome\\anaconda3\\envs\\fyp_tf\\Lib\\site-packages"
+  ],
+
+  // Reduce the noisy missing-import diagnostic (you already used this)
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "none"
+  }
+}

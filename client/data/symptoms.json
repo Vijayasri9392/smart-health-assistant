@@ -1,0 +1,7 @@
+{
+  "symptoms": {
+    "fever cough": "Flu",
+    "chest pain": "Heart Issue",
+    "headache": "Migraine"
+  }
+}

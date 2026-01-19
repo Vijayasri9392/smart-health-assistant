@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><title>Reminder</title></head>
+<body>
+  <h1>Medicine Reminder</h1>
+  <input id="med" placeholder="Medicine">
+  <input id="dos" placeholder="Dosage">
+  <input id="time" type="time">
+  <input id="email" placeholder="your@mail.com">
+  <button onclick="setReminder()">Set</button>
+
+  <script>
+    async function setReminder() {
+      const body = JSON.stringify({
+        medicine: med.value, dosage: dos.value,
+        time: time.value, email: email.value
+      });
+      await fetch('/api/reminder', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body
+      });
+      alert('Reminder scheduled!');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Health Assistant - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+
+    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZAAUKjlPES6PDZbciEH8u-daa3MXzQME&libraries=places&callback=initMap"></script> -->
+    <script src="js/lab-analyzer.js"></script>
+    <script src="js/dashboard.js"></script>
+</head>
+
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="w-20 h-20 border-4 border-green-200 border-t-green-500 rounded-full animate-spin mx-auto mb-4">
+            </div>
+            <p class="text-lg font-semibold text-gray-700">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Navigation (Hidden until login) -->
+    <nav id="navBar" class="bg-white shadow-lg fixed w-full z-40 hidden">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-2xl font-bold text-green-600">🩺 Smart Health</div>
+                <div class="flex space-x-4 items-center">
+                    <button id="voiceBtn"
+                        class="p-3 bg-green-100 hover:bg-green-200 rounded-full text-xl shadow-md mx-2">
+                        🎤
+                    </button>
+                    <a href="/history" id="historyBtn"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        History
+                    </a>
+
+                    <!-- NEW Medicine Reminders Button -->
+                    <button id="medicineReminderBtn"
+                        class="p-3 bg-purple-100 hover:bg-purple-200 rounded-2xl shadow-lg transition-all">
+                        💊 Reminders
+                    </button>
+
+
+
+
+                    <!-- NEW Google Maps Doctors Button -->
+                    <button id="findDoctorsBtn"
+                        class="p-3 bg-red-100 hover:bg-red-200 rounded-2xl shadow-lg transition-all">
+                        🏥 Find Doctors
+                    </button>
+
+
+
+                    <div class="relative">
+                        <button id="profileBtn"
+                            class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center font-bold text-white">
+                            U
+                        </button>
+                        <div id="profileDropdown"
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl hidden">
+                            <a href="profile.html" id="profileBtn"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            <button id="logoutBtn"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 pb-20 px-4 max-w-4xl mx-auto" id="mainContent" style="display:none;">
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">How are you feeling?</h2>
+            <textarea id="symptomsInput"
+                class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none resize-vertical h-32 text-lg"
+                placeholder="Describe your symptoms... (fever, cough, chest pain, etc.)">
+            </textarea>
+            <div class="flex space-x-4 mt-4">
+                <button id="analyzeBtn"
+                    class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:shadow-lg">
+                    🔍 Analyze Symptoms
+                </button>
+                <button id="uploadBtn"
+                    class="px-6 bg-blue-500 text-white py-4 rounded-xl font-semibold hover:bg-blue-600">
+                    📁 Upload Report
+                </button>
+                <!-- NEW Lab Report Upload (Hidden trigger) -->
+                <input type="file" id="labReportUpload" accept=".pdf,.txt,.doc,.docx,.csv,.png,.jpg,.jpeg"
+                    style="display: none;">
+
+            </div>
+
+
+            <!-- NEW Modals -->
+            <!-- Medicine Reminder Modal -->
+            <div id="medicineModal"
+                class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-3xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                    <h2
+                        class="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        💊 Medicine Reminders</h2>
+                    <div class="space-y-4">
+                        <input id="medicineName" placeholder="Medicine name (e.g., Paracetamol)"
+                            class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none">
+                        <input id="medicineTime" type="time"
+                            class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none">
+                        <input id="medicineDosage" placeholder="Dosage (e.g., 1 tablet)"
+                            class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none">
+                        <button id="addReminderBtn"
+                            class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 px-8 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all">
+                            ➕ Add Reminder
+                        </button>
+                    </div>
+                    <div id="remindersList" class="mt-6 max-h-64 overflow-y-auto space-y-3"></div>
+                    <button id="closeMedicineModal"
+                        class="mt-6 w-full bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-xl font-bold transition-all">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+            <!-- Doctors Map Modal -->
+            <div id="doctorsMapModal"
+                class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-3xl p-6 max-w-4xl w-full max-h-[90vh] shadow-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">🏥 Nearby Doctors</h2>
+                        <button id="closeDoctorsModal"
+                            class="text-2xl font-bold text-gray-500 hover:text-gray-700">×</button>
+                    </div>
+                    <div id="doctorsMap" class="w-full h-96 rounded-2xl shadow-xl"></div>
+                    <div id="doctorsList" class="mt-6 grid md:grid-cols-2 gap-4 max-h-64 overflow-y-auto"></div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <!-- Results -->
+        <div id="results" class="hidden bg-white rounded-2xl shadow-xl p-8">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <div id="map" style="height:400px;display:none;"></div>
+
+    <!-- File Upload Modal -->
+    <!-- <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-4">Upload Lab Report</h3> -->
+    <!-- Put this inside your dashboard/content area -->
+    <!-- <button id="openLabUploadBtn" class="btn btn-primary">
+            Upload Lab Report
+            </button>
+
+            <input 
+            type="file" 
+            id="labReportUpload" 
+            accept=".pdf,.txt,.doc,.docx,.csv" 
+            style="display:none;"
+            >
+
+            <div id="reportResult"></div>
+
+            <div class="flex space-x-3">
+                <button id="submitReport" class="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-semibold">Analyze</button>
+                <button id="cancelUpload" class="flex-1 bg-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold">Cancel</button>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- <input type="file" id="labReportUpload" accept=".jpg,.jpeg,.png,.pdf,.pdf,.txt,.docx" style="display:none;">
+    <button onclick="document.getElementById('labReportUpload').click()">Upload Lab Report</button>
+    <div id="reportResult"></div> -->
+
+
+    <script>
+        class HealthAssistant {
+            constructor() {
+                this.token = localStorage.getItem('token');
+                if (!this.token) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // ✅ HIDE LOADING SCREEN FIRST
+                const loadingScreen = document.getElementById('loadingScreen') ||
+                    document.querySelector('.loading') ||
+                    document.querySelector('[id*="loading"]');
+                if (loadingScreen) loadingScreen.style.display = 'none';
+
+                // Check history details
+                const historyDetails = localStorage.getItem('viewHistoryDetails');
+                if (historyDetails) {
+                    localStorage.removeItem('viewHistoryDetails');
+                    try {
+                        const details = JSON.parse(atob(historyDetails));
+                        this.showHistoryDetails(details);
+                        return;
+                    } catch (e) {
+                        console.error('History parse error');
+                    }
+                }
+
+                this.init();
+            }
+            showHistoryDetails(result) {
+                // Hide loading + show results immediately
+                document.body.classList.remove('loading');
+                document.getElementById('results')?.classList.remove('hidden');
+
+                // Fill symptom input
+                document.getElementById('symptomsInput').value = `History: ${result.disease}`;
+
+                // Show full diagnosis
+                this.displayResults(result);
+
+                // Show navbar/content
+                document.querySelectorAll('.navBar, #navBar, nav').forEach(nav => nav.classList.remove('hidden'));
+                document.querySelectorAll('#mainContent, main, .main').forEach(main => main.style.display = 'block');
+            }
+
+            // ✅ NEW METHOD - Display history results
+            //     displayHistoryDetails(result) {
+            //     console.log('🔄 Displaying history:', result);
+
+            //     document.getElementById('symptomsInput').value = `History: ${result.disease}`;
+            //     document.getElementById('results').classList.remove('hidden');
+
+            //     document.getElementById('resultContent').innerHTML = `
+            //         <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-8 rounded-3xl shadow-2xl">
+            //             <h2 class="text-4xl font-bold mb-8 text-center text-gray-800">📋 Previous Diagnosis</h2>
+            //             <div class="grid md:grid-cols-2 gap-6 mb-8">
+            //                 <div class="bg-white p-8 rounded-2xl shadow-xl">
+            //                     <h3 class="text-3xl font-bold text-indigo-600 mb-4">${result.disease}</h3>
+            //                     <div class="flex items-center">
+            //                         <span class="px-4 py-2 bg-gradient-to-r from-${result.severity === 'high' ? 'red' : 'blue'}-400 to-${result.severity === 'high' ? 'orange' : 'indigo'}-500 text-white rounded-xl font-bold text-lg">
+            //                             ${result.severity?.toUpperCase() || 'LOW'}
+            //                         </span>
+            //                     </div>
+            //                 </div>
+            //             </div>
+
+            //             <div class="grid md:grid-cols-2 gap-6 text-lg">
+            //                 <div class="bg-yellow-50 p-6 rounded-2xl border-l-4 border-yellow-400">
+            //                     <h4 class="font-bold text-xl mb-3">🛡️ Precautions</h4>
+            //                     <p class="text-gray-700">${result.precautions || 'Rest and monitor symptoms'}</p>
+            //                 </div>
+            //                 <div class="bg-green-50 p-6 rounded-2xl border-l-4 border-green-400">
+            //                     <h4 class="font-bold text-xl mb-3">💊 Medicines</h4>
+            //                     <p class="text-gray-700">${result.medicines || 'Paracetamol (consult doctor)'}</p>
+            //                 </div>
+            //                 <div class="bg-blue-50 p-6 rounded-2xl border-l-4 border-blue-400">
+            //                     <h4 class="font-bold text-xl mb-3">💡 Suggestions</h4>
+            //                     <p class="text-gray-700">${result.suggestions || 'Consult if symptoms persist'}</p>
+            //                 </div>
+            //                 <div class="bg-orange-50 p-6 rounded-2xl border-l-4 border-orange-400">
+            //                     <h4 class="font-bold text-xl mb-3">🍎 Diet</h4>
+            //                     <p class="text-gray-700">${result.foodAdvice || 'Light diet, plenty fluids'}</p>
+            //                 </div>
+            //             </div>
+
+            //             ${result.isCritical ? `
+            //                 <div class="bg-red-50 border-2 border-red-200 p-8 rounded-3xl mt-8 shadow-2xl">
+            //                     <div class="flex items-center mb-4">
+            //                         <div class="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center mr-4">
+            //                             <span class="text-2xl font-bold text-white">🚨</span>
+            //                         </div>
+            //                         <h3 class="text-2xl font-bold text-red-800">CRITICAL ALERT</h3>
+            //                     </div>
+            //                     <p class="text-lg text-red-700">Seek immediate medical attention!</p>
+            //                 </div>
+            //             ` : ''}
+
+            //             <div class="flex gap-4 mt-12">
+            //                 <button onclick="location.reload()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-4 px-8 rounded-2xl font-bold text-xl shadow-xl transition-all">
+            //                     🔍 New Analysis
+            //                 </button>
+            //                 <a href="/history" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-4 px-8 rounded-2xl font-bold text-xl text-center shadow-xl transition-all">
+            //                     📋 All History
+            //                 </a>
+            //             </div>
+            //         </div>
+            //     `;
+
+            //     // Show UI
+            //     document.querySelector('#navBar, .navbar')?.classList.remove('hidden');
+            //     document.querySelector('#mainContent, main')?.style.display = 'block';
+            //     document.getElementById('loadingScreen')?.style.display = 'none';
+            // }
+
+
+
+            async init() {
+
+                // if (!this.token) {
+                //     window.location.href = '/login.html';
+                //     return;
+                // }
+
+                try {
+                    const user = await this.apiCall('/profile');
+                    //const user = await this.validateToken();
+                    document.getElementById('profileBtn').textContent = user.name?.[0] || 'U';
+                    //localStorage.setItem('user', JSON.stringify(user));
+                } catch {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('navBar').classList.remove('hidden');
+                document.getElementById('mainContent').style.display = 'block';
+                this.bindEvents();
+            }
+
+            async apiCall(endpoint, options = {}) {
+                const response = await fetch(`/api/health${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.token}`
+                    },
+                    ...options
+                });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                    throw new Error('Unauthorized');
+                }
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'API error');
+                }
+                return response.json();
+            }
+
+            async validateToken() {
+                return this.apiCall('/profile');
+            }
+
+            bindEvents() {
+                document.getElementById('analyzeBtn').addEventListener('click', () => this.analyzeSymptoms());
+                document.getElementById('voiceBtn').addEventListener('click', () => this.startVoice());
+
+
+                // document.getElementById('uploadBtn').addEventListener('click', () => {
+                //     document.getElementById('uploadModal').classList.remove('hidden');
+                // });
+                // document.getElementById('cancelUpload').addEventListener('click', () => {
+                //     document.getElementById('uploadModal').classList.add('hidden');
+                // });
+                // document.getElementById('submitReport').addEventListener('click', () => this.uploadReport());
+
+
+                document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+
+                document.getElementById('profileBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const dropdown = document.getElementById('profileDropdown');
+                    dropdown.classList.toggle('hidden');
+
+                });
+
+                // Lab Upload Fix
+                const uploadBtn = document.getElementById("uploadBtn");
+                const labInput = document.getElementById("labReportUpload");
+
+                if (uploadBtn && labInput) {
+                    uploadBtn.addEventListener("click", () => labInput.click());
+
+                    labInput.addEventListener("change", async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        uploadBtn.innerHTML = `📁 ${file.name}`;
+
+                        // call backend analyze-report
+                        const formData = new FormData();
+                        formData.append("report", file);
+
+                        try {
+                            const result = await fetch("/api/health/analyze-report", {
+                                method: "POST",
+                                headers: { Authorization: `Bearer ${this.token}` },
+                                body: formData
+                            }).then(r => r.json());
+
+                            this.displayResults({
+                                disease: result.predictedDisease || "Report Analysis",
+                                suggestions: (result.findings && result.findings.length)
+                                    ? result.findings.join("<br/>")
+                                    : "No keyword findings."
+                            });
+
+                        } catch (err) {
+                            alert("❌ Could not analyze report");
+                        }
+                    });
+                }
+
+
+            }
+
+            async analyzeSymptoms() {
+                const symptomsText = document.getElementById('symptomsInput').value.trim();
+                if (!symptomsText) return alert('Please enter symptoms');
+
+                const symptoms = symptomsText.split(',').map(s => s.trim()).filter(Boolean);
+
+                try {
+                    document.getElementById('analyzeBtn').disabled = true;
+                    document.getElementById('analyzeBtn').textContent = 'Analyzing...';
+
+                    const result = await this.apiCall('/predict', {
+                        method: 'POST',
+                        body: JSON.stringify({ symptoms })
+                    });
+
+                    this.displayResults(result);
+                    // ✅ SAVE TO HISTORY with proper data
+                    await this.saveHistory(symptomsText, result);
+
+                    console.log('✅ Saved to history:', symptomsText, result.disease);
+
+                } catch (error) {
+                    console.error('Analyze error:', error);
+                    alert('Error: ' + error.message);
+                } finally {
+                    document.getElementById('analyzeBtn').disabled = false;
+                    document.getElementById('analyzeBtn').textContent = '🔍 Analyze Symptoms';
+                }
+            }
+
+            async uploadReport() {
+                const file = document.getElementById('reportFile').files[0];
+                if (!file) return alert('Please select a file');
+
+                const formData = new FormData();
+                formData.append('report', file);
+
+                try {
+                    document.getElementById('submitReport').disabled = true;
+                    const result = await fetch('/api/health/analyze-report', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${this.token}` },
+                        body: formData
+                    }).then(r => r.json());
+
+                    this.displayResults({ disease: result.analysis, suggestions: result.recommendation });
+                    document.getElementById('uploadModal').classList.add('hidden');
+                } catch (error) {
+                    alert('Upload error: ' + error.message);
+                } finally {
+                    document.getElementById('submitReport').disabled = false;
+                }
+            }
+
+            async saveHistory(symptomsText, result) {
+                try {
+                    // Server save (optional)
+                    await this.apiCall('/history', {
+                        method: 'POST',
+                        body: JSON.stringify({ symptoms: symptomsText, disease: result.disease, details: result })
+                    }).catch(e => console.log('Server save failed'));
+                } catch (e) { }
+
+                // ✅ ALWAYS save locally with full details
+                let history = JSON.parse(localStorage.getItem('healthHistory') || '[]');
+                history.unshift({
+                    _id: Date.now().toString(),
+                    symptoms: symptomsText,
+                    disease: result.disease,
+                    details: result,  // ✅ Full details object
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('healthHistory', JSON.stringify(history.slice(0, 50)));
+                console.log('✅ Saved to history with full details');
+            }
+
+
+
+
+            displayResults(result) {
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('resultContent').innerHTML = `
+                    <h2 class="text-3xl font-bold mb-4">${result.disease}</h2>
+                    <p class="text-lg mb-6">${result.suggestions || result.analysis || ''}</p>
+                    <div class="space-y-4">
+                        ${result.precautions ? `<p><strong>Precautions:</strong> ${result.precautions}</p>` : ''}
+                        ${result.suggestions ? `<p><strong>Suggestions:</strong> ${result.suggestions}</p>` : ''}
+                        ${result.medicines ? `<p><strong>Medicines:</strong> ${result.medicines}</p>` : ''}
+                        ${result.isCritical ? '<div class="bg-red-100 p-4 rounded-xl border border-red-300"><strong>🚨 CRITICAL:</strong> Seek immediate medical attention!</div>' : ''}
+                    </div>
+                    <button onclick="location.reload()" class="mt-6 bg-green-500 text-white px-8 py-3 rounded-xl font-bold">Analyze Again</button>
+                `;
+            }
+
+            // bindEvents() {
+            //     document.getElementById('analyzeBtn').onclick = () => this.analyzeSymptoms();
+            //     document.getElementById('logoutBtn').onclick = () => {
+            //         localStorage.clear();
+            //         window.location.href = '/login';
+            //     };
+            // }
+
+            // ADD THIS NEW METHOD to HealthAssistant class:
+            async startVoice() {
+                console.log('🎤 Voice button clicked');
+
+                // Check browser support
+                if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+                    alert('🎤 Voice not supported. Use Chrome browser (Desktop/Mobile).');
+                    return;
+                }
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';  // ✅ Changed to en-US
+
+                const voiceBtn = document.getElementById('voiceBtn');
+
+                // Visual feedback
+                voiceBtn.innerHTML = '🎙️';
+                voiceBtn.className = 'p-3 bg-orange-200 hover:bg-orange-300 rounded-full text-xl shadow-lg animate-pulse';
+
+                recognition.onstart = () => {
+                    console.log('🎤 Listening... Speak now!');
+                    voiceBtn.innerHTML = '🔴';
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    console.log('🎤 SUCCESS:', transcript);
+
+                    document.getElementById('symptomsInput').value = transcript;
+                    voiceBtn.innerHTML = '✅';
+
+                    // Auto analyze after 1 second
+                    setTimeout(() => {
+                        document.getElementById('analyzeBtn').click();
+                    }, 1000);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('🎤 Voice ERROR:', event.error);
+                    voiceBtn.innerHTML = '❌';
+
+                    let errorMsg = 'Voice failed';
+                    if (event.error === 'not-allowed') {
+                        errorMsg = '🎤 Microphone permission denied. Click site icon → Allow microphone.';
+                    } else if (event.error === 'no-speech') {
+                        errorMsg = 'No speech detected. Speak louder.';
+                    }
+
+                    alert(errorMsg);
+                };
+
+                recognition.onend = () => {
+                    console.log('🎤 Voice ended');
+                    setTimeout(() => {
+                        voiceBtn.innerHTML = '🎤';
+                        voiceBtn.className = 'p-3 bg-green-100 hover:bg-green-200 rounded-full text-xl shadow-md mx-2';
+                    }, 1500);
+                };
+
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.error('Voice start error:', error);
+                    alert('🎤 Failed to start. Check Chrome microphone permissions.');
+                }
+            }
+
+            logout() {
+                localStorage.clear();
+                window.location.href = '/login.html';
+            }
+        }
+
+        new HealthAssistant();
+    </script>
+</body>
+
+</html>

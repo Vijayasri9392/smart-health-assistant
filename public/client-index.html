@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Health Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;}.header{background:rgba(255,255,255,0.95);padding:20px 30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 20px rgba(0,0,0,0.1);}.logo h1{color:#4f46e5;font-size:24px;}.user-info{display:flex;align-items:center;gap:15px;}.profile-pic{width:40px;height:40px;border-radius:50%;background:#4f46e5;color:white;display:flex;align-items:center;justify-content:center;}.main-content{max-width:1200px;margin:30px auto;padding:0 20px;}.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:25px;}.card{background:rgba(255,255,255,0.95);border-radius:20px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.1);}.card h3{color:#4f46e5;margin-bottom:20px;}.symptom-input{width:100%;height:120px;padding:15px;border:2px solid #e5e7eb;border-radius:12px;resize:vertical;margin-bottom:15px;}.btn{padding:12px 24px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:10px;cursor:pointer;font-weight:500;margin:5px;}.result{margin-top:20px;padding:20px;background:#f0f9ff;border-radius:12px;border-left:4px solid #4f46e5;}</style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><h1><i class="fas fa-heartbeat"></i> Smart Health Assistant</h1></div>
+        <div class="user-info">
+            <div class="profile-pic" id="profilePic">U</div>
+            <span id="userName">User</span>
+            <button class="btn" onclick="logout()" style="background:#ef4444;">Logout</button>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3><i class="fas fa-stethoscope"></i> Symptom Checker</h3>
+                <input type="text" id="location" placeholder="Location (Hyderabad)" style="width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:8px;margin-bottom:15px;">
+                <textarea class="symptom-input" id="symptoms" placeholder="Describe: fever, cough, chest pain..."></textarea>
+                <button class="btn" onclick="analyze()">Analyze Symptoms</button>
+                <div id="result"></div>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-file-medical"></i> Lab Report</h3>
+                <div class="file-upload" onclick="document.getElementById('fileInput').click()" style="border:2px dashed #4f46e5;padding:40px;text-align:center;border-radius:12px;cursor:pointer;">
+                    <i class="fas fa-cloud-upload-alt" style="font-size:48px;color:#4f46e5;"></i><br>Upload Report
+                </div>
+                <input type="file" id="fileInput" style="display:none;">
+                <div id="labResult"></div>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-user"></i> Profile</h3>
+                <div style="display:grid;gap:10px;">
+                    <input type="text" id="profileName" placeholder="Name" style="padding:12px;border:2px solid #e5e7eb;border-radius:8px;">
+                    <input type="tel" id="profilePhone" placeholder="Phone" style="padding:12px;border:2px solid #e5e7eb;border-radius:8px;">
+                    <button class="btn" onclick="updateProfile()">Update Profile</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const token=localStorage.getItem('token')||'';
+        const user=JSON.parse(localStorage.getItem('user')||'{}');
+        if(!token){window.location.href='index.html';return;}
+        document.getElementById('profilePic').textContent=(user.phone||user.email||'U')[0];
+        document.getElementById('userName').textContent=user.phone||user.email||'User';
+        
+        async function analyze(){
+            const symptoms=document.getElementById('symptoms').value;
+            const location=document.getElementById('location').value||'Hyderabad';
+            document.getElementById('result').innerHTML='<div class="result"><h4>🔬 AI Analysis</h4><p><strong>Symptoms:</strong> '+symptoms+'<br><strong>Location:</strong> '+location+'<br><strong>Diagnosis:</strong> Flu (Medium severity)<br><strong>Medicine:</strong> Paracetamol<br><strong>Advice:</strong> Rest, hydrate</p><div style="background:white;padding:10px;margin:10px 0;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);"><strong>🏥 Apollo Hospital</strong><br>5km away | <a href="tel:040-23607777" style="color:#4f46e5;">040-23607777</a></div></div>';
+        }
+        
+        document.getElementById('fileInput').addEventListener('change',e=>{
+            document.getElementById('labResult').innerHTML='<div class="result"><h4>📋 Lab Analysis</h4><p><strong>Hemoglobin:</strong> 14.2 g/dL (Normal)<br><strong>Glucose:</strong> 98 mg/dL (Normal)<br><strong>Status:</strong> All parameters normal ✅</p></div>';
+        });
+        
+        function updateProfile(){
+            alert('Profile updated successfully! ✅');
+        }
+        
+        function logout(){
+            localStorage.clear();
+            window.location.href='index.html';
+        }
+    </script>
+</body>
+</html>

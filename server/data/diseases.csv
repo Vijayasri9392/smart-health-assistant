@@ -1,0 +1,6 @@
+symptom,disease,severity,reason,percentage,precaution,food_daily,doctor_speciality
+fever and headache,Influenza,moderate,viral infection,82,"rest, fluids, steam","warm soup, citrus, ginger","General Practitioner"
+chest pain,Heart Attack,severe,blocked artery,95,"ER, low sodium","oats, salmon, leafy greens","Cardiologist"
+stomach pain,Gastroenteritis,moderate,bacterial invasion,78,"hydration, bland diet","banana, rice, toast","Gastroenterologist"
+dry cough,Common Cold,mild,viral URTI,65,"steam, rest","honey, warm water","GP"
+joint pain,Arthritis,moderate,inflammation,72,"meds, exercise","fish, turmeric","Rheumatologist"

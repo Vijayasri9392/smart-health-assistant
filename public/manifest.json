@@ -1,0 +1,16 @@
+{
+    "name": "Smart Health Assistant",
+    "short_name": "Health AI",
+    "description": "AI-powered healthcare assistant",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#10b981",
+    "theme_color": "#10b981",
+    "icons": [
+        {
+            "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9Ijk2IiBmaWxsPSIjMTBiOTgxIi8+CjxwYXRoIGQ9Ik05NiA0MEw4MCA1MkM3OC4wMDU3IDUzLjE0OCA3Ny4zOTUgNTUuMjE3IDc4LjE2MiA1Ni44MjZMODYuNDIyIDY3LjQ1NUM4Ny4yOTQgNjkuMjA0IDg4Ljg4OCA2OS40NDMgOTAuNjI1IDY4LjgzMUwxMDEuMzcgNjUuNjgzTDExMi4xIDE3MC4xMzlDMTEyLjY5NSA3MS44NTcgMTE0LjM3IDczLjA1IDEzLjQzMiA3Mi43MzNMMTE2IDcyLjQ1NUwxMjAgNjBDMTIxLjk5NSA1OC44NTIgMTIyLjYwNSA1Ni43ODMgMTIxLjgzOCA1NS4xNzZMMTI5LjQ2IDY2LjE4MkMxMzAuMzA0IDY3Ljc5MiAxMzEuODk2IDY4LjA1IDEzMy42MzQgNjcuNDQ3TDEzOS4zNzUgNjUuMjQ4TDE0MS4wMzMgNzIuODI2QzE0MS42OTUgNzQuNTc0IDE0My4zNzIgNzUuNzcxIDE0NC40MzIgNzUuNDQ5TDE1MiA3NC4yNUwxNTEgODBDMTUwLjAwNSA4MS4xNDggMTQ5LjM5NSA4My4yMTcgMTUwLjE2MiA4NC44MjZMMTU4LjQyMiA5NS40NTVDMTU5LjI5NCA5Ny4yMDQgMTYwLjg4OCA5Ny40NDMgMTYyLjYyNSA5Ni44MzFMMTczLjM3NSA5My42ODNMMjA0IDEyMEwxOTIgMTkyTDk2IDQwWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+            "sizes": "192x192",
+            "type": "image/svg+xml"
+        }
+    ]
+}

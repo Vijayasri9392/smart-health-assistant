@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Smart Health Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+</head>
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10">
+        <div class="text-center mb-8">
+            <div class="w-24 h-24 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">
+                🩺
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Create Account</h1>
+            <p class="text-gray-600">Join Smart Health Assistant</p>
+        </div>
+
+        <form id="signupForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input type="text" id="signupName" required
+                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all text-lg"
+                    placeholder="Your full name">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="signupEmail" required
+                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all text-lg"
+                    placeholder="your@email.com">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone (Optional)</label>
+                <input type="tel" id="signupPhone"
+                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all text-lg"
+                    placeholder="+91 98765 43210">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input type="password" id="signupPassword" required minlength="6"
+                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all text-lg"
+                    placeholder="Create a strong password">
+            </div>
+            <button type="button" id="sendOtpBtn"
+                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-8 rounded-xl font-bold text-xl hover:shadow-xl transform hover:-translate-y-1 transition-all">
+                Send Verification Code
+            </button>
+        </form>
+
+        <!-- OTP Section -->
+        <div id="otpSection" class="hidden space-y-6 mt-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
+                <input type="text" id="otpCode" maxlength="6" required
+                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-center text-2xl font-bold tracking-widest text-lg"
+                    placeholder="123456">
+            </div>
+            <div class="flex space-x-3">
+                <button type="button" id="verifyOtpBtn"
+                    class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
+                    Verify & Continue
+                </button>
+                <button type="button" id="resendOtpBtn"
+                    class="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-gray-600">
+                    Resend Code
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <p class="text-gray-600">Already have an account? 
+                <a href="/login" class="font-semibold text-green-600 hover:text-green-700">Sign in here</a>
+            </p>
+        </div>
+
+        <div id="signupError" class="hidden mt-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"></div>
+    </div>
+
+    <script>
+        let currentEmail = '';
+
+        document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const phone = document.getElementById('signupPhone').value;
+            const password = document.getElementById('signupPassword').value;
+
+            if (!name || !email || !password) {
+                showError('Please fill all required fields');
+                return;
+            }
+
+            currentEmail = email;
+            const btn = document.getElementById('sendOtpBtn');
+            
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, phone, name })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('otpSection').classList.remove('hidden');
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                btn.textContent = 'Send Verification Code';
+                btn.disabled = false;
+            }
+        });
+
+       document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+    const code = document.getElementById('otpCode').value;
+    const btn = document.getElementById('verifyOtpBtn');
+    
+    btn.disabled = true;
+    btn.textContent = 'Verifying...';
+
+    try {
+        const response = await fetch('/api/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: currentEmail, code })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = '/dashboard';
+    } catch (error) {
+        alert(error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verify & Continue';
+    }
+});
+
+
+        document.getElementById('resendOtpBtn').addEventListener('click', async () => {
+            // Same as send OTP but show loading
+            document.getElementById('resendOtpBtn').textContent = 'Sending...';
+            document.getElementById('resendOtpBtn').disabled = true;
+            
+            setTimeout(() => {
+                document.getElementById('resendOtpBtn').textContent = 'Resend Code';
+                document.getElementById('resendOtpBtn').disabled = false;
+                showError('Code resent successfully!', 'bg-green-50 border-green-200 text-green-700');
+            }, 1500);
+        });
+
+        function showError(message, classes = 'bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm') {
+            const errorDiv = document.getElementById('signupError');
+            errorDiv.textContent = message;
+            errorDiv.className = `mt-6 p-4 ${classes}`;
+            errorDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
